@@ -359,42 +359,58 @@ export function TextEditor() {
                                 <AnimatePresence>
                                     {showHistoryPopup && (
                                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute bottom-full mb-2 right-0 bg-white border shadow-lg rounded-lg p-3 w-64 z-30">
-                                            <Badge variant="outline" className="text-sm px-4 py-2 border-secondary/30 text-secondary cursor-pointer hover:bg-secondary/10" onClick={() => setShowSavedTexts(!showSavedTexts)} title="Ver textos salvos"><Clock className="w-4 h-4 mr-2" />{savedTexts.length} salvos</Badge>
-                                            <AnimatePresence>
-                                                {showSavedTexts && (
-                                                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute bottom-full mb-2 right-0 bg-white border shadow-lg rounded-lg p-3 w-80 z-30">
-                                                        <div className="flex justify-between items-center mb-2">
-                                                            <h4 className="text-xs font-semibold">Últimos 5 Textos</h4>
-                                                            <Button variant="ghost" size="sm" onClick={() => setShowSavedTexts(false)} className="h-5 w-5 p-0"><X className="w-3 h-3" /></Button>
-                                                        </div>
-                                                        {savedTexts.length === 0 ? (
-                                                            <p className="text-xs text-muted-foreground text-center py-4">Nenhum texto salvo</p>
-                                                        ) : (
-                                                            <div className="max-h-64 overflow-y-auto space-y-2">
-                                                                {savedTexts.map(saved => (
-                                                                    <div key={saved.id} className="border rounded p-2 hover:bg-muted/50 group">
-                                                                        <div className="flex justify-between items-start gap-2">
-                                                                            <button onClick={() => handleLoadText(saved)} className="flex-1 text-left">
-                                                                                <p className="text-xs text-foreground line-clamp-2">{saved.plainText}</p>
-                                                                                <p className="text-[10px] text-muted-foreground mt-1">{new Date(saved.timestamp).toLocaleString('pt-BR')}</p>
-                                                                            </button>
-                                                                            <Button variant="ghost" size="sm" onClick={() => { const updated = savedTexts.filter(t => t.id !== saved.id); setSavedTexts(updated); localStorage.setItem('textfix-saved-texts', JSON.stringify(updated)) }} className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100" title="Deletar"><Trash2 className="w-3 h-3 text-destructive" /></Button>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                        </div>
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="text-xs font-semibold">Histórico</h4>
+                                                <Button variant="ghost" size="sm" onClick={() => setShowHistoryPopup(false)} className="h-5 w-5 p-0"><X className="w-3 h-3" /></Button>
+                                            </div>
+                                            <div className="max-h-48 overflow-y-auto space-y-1">
+                                                {history.slice().reverse().map((_, idx) => {
+                                                    const actualIdx = history.length - 1 - idx
+                                                    return <div key={idx} className={`text-xs p-1.5 rounded ${actualIdx === historyIndex ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground'}`}>{actualIdx === historyIndex ? '→ ' : '  '}Mudança #{actualIdx + 1}</div>
+                                                })}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
-                            <div className="pt-4 border-t flex flex-wrap gap-2">
-                                <Button onClick={handleSaveText} disabled={!text} size="lg" variant="outline" className="hover:bg-secondary/10 hover:text-secondary" title="Salvar texto (Ctrl+S)"><Save className="w-5 h-5 mr-2" />Salvar Texto</Button>
-                                <Button onClick={handleCopy} disabled={!text} size="lg" className="bg-primary hover:bg-primary/90 text-white shadow-lg" title="Copiar texto"><Copy className="w-5 h-5 mr-2" />Copiar Texto</Button>
+                            <div className="relative">
+                                <Badge variant="outline" className="text-sm px-4 py-2 border-secondary/30 text-secondary cursor-pointer hover:bg-secondary/10" onClick={() => setShowSavedTexts(!showSavedTexts)} title="Ver textos salvos"><Clock className="w-4 h-4 mr-2" />{savedTexts.length} salvos</Badge>
+                                <AnimatePresence>
+                                    {showSavedTexts && (
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute bottom-full mb-2 right-0 bg-white border shadow-lg rounded-lg p-3 w-80 z-30">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="text-xs font-semibold">Últimos 5 Textos</h4>
+                                                <Button variant="ghost" size="sm" onClick={() => setShowSavedTexts(false)} className="h-5 w-5 p-0"><X className="w-3 h-3" /></Button>
+                                            </div>
+                                            {savedTexts.length === 0 ? (
+                                                <p className="text-xs text-muted-foreground text-center py-4">Nenhum texto salvo</p>
+                                            ) : (
+                                                <div className="max-h-64 overflow-y-auto space-y-2">
+                                                    {savedTexts.map(saved => (
+                                                        <div key={saved.id} className="border rounded p-2 hover:bg-muted/50 group">
+                                                            <div className="flex justify-between items-start gap-2">
+                                                                <button onClick={() => handleLoadText(saved)} className="flex-1 text-left">
+                                                                    <p className="text-xs text-foreground line-clamp-2">{saved.plainText}</p>
+                                                                    <p className="text-[10px] text-muted-foreground mt-1">{new Date(saved.timestamp).toLocaleString('pt-BR')}</p>
+                                                                </button>
+                                                                <Button variant="ghost" size="sm" onClick={() => { const updated = savedTexts.filter(t => t.id !== saved.id); setSavedTexts(updated); localStorage.setItem('textfix-saved-texts', JSON.stringify(updated)) }} className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100" title="Deletar"><Trash2 className="w-3 h-3 text-destructive" /></Button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
+
+                        <div className="pt-4 border-t flex flex-wrap gap-2">
+                            <Button onClick={handleSaveText} disabled={!text} size="lg" variant="outline" className="hover:bg-secondary/10 hover:text-secondary" title="Salvar texto (Ctrl+S)"><Save className="w-5 h-5 mr-2" />Salvar Texto</Button>
+                            <Button onClick={handleCopy} disabled={!text} size="lg" className="bg-primary hover:bg-primary/90 text-white shadow-lg" title="Copiar texto"><Copy className="w-5 h-5 mr-2" />Copiar Texto</Button>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
         </motion.div>
