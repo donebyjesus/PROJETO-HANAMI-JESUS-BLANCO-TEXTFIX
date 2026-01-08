@@ -3,6 +3,7 @@ import { TextEditor } from '@/components/TextEditor'
 import { QuickLinks } from '@/components/QuickLinks'
 import { UnitConverter } from '@/components/UnitConverter'
 import { Logo } from '@/components/Logo'
+import { AccessibilityControls } from '@/components/AccessibilityControls'
 
 function App() {
     return (
@@ -11,6 +12,11 @@ function App() {
                 {/* Header TextFix */}
                 <header className="border-b bg-gradient-to-r from-primary/5 via-background to-secondary/5 backdrop-blur-sm sticky top-0 z-30 shadow-soft">
                     <div className="container mx-auto px-4 py-4 sm:py-6">
+                        {/* Controles de Acessibilidade - Topo */}
+                        <div className="flex justify-end mb-4">
+                            <AccessibilityControls />
+                        </div>
+
                         <div className="flex flex-col items-center justify-center gap-3">
                             {/* Logo TextFix */}
                             <Logo size={180} className="mb-2" />
