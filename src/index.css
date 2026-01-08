@@ -1,113 +1,193 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* === CORES TEXTFIX === */
-    /* Conceito: "Ordem a partir do Caos" */
+    /* ========================================
+       SISTEMA DE DESIGN HANAMI/TEXTFIX
+       Baseado em: #5481FA (Primary), #22307F (Secondary)
+       Tipografia: Poppins
+       Border Radius: 0.75rem (12px)
+    ======================================== */
 
-    --background: 210 20% 97%;
-    /* #F5F8FA - Fundo cinza claro */
-    --foreground: 210 55% 15%;
-    /* #0F1F3D - Navy escuro para texto */
+    /* === CORES PRINCIPAIS === */
 
+    /* Background: Branco com tinte azulado sutil */
+    --background: 220 40% 98.5%;
+    /* #F8FAFF */
+    --foreground: 220 60% 15%;
+    /* #1E293B - Texto principal */
+
+    /* Cards e Surfaces: Branco puro */
     --card: 0 0% 100%;
-    /* #FFFFFF - Branco puro */
-    --card-foreground: 210 55% 23%;
-    /* #1A365D - Navy para texto em cards */
+    /* #FFFFFF */
+    --card-foreground: 220 60% 15%;
+    /* #1E293B */
 
+    /* Popovers */
     --popover: 0 0% 100%;
-    --popover-foreground: 210 55% 23%;
+    --popover-foreground: 220 60% 15%;
 
-    /* Primária: Ciano Brilhante (do lado direito do logo) */
-    --primary: 200 100% 50%;
-    /* #00A3FF - Ciano tecnológico */
+    /* Primary: Azul Hanami (#5481FA) */
+    --primary: 224 95% 65%;
+    /* #5481FA */
     --primary-foreground: 0 0% 100%;
+    /* Branco */
 
-    /* Secundária: Navy Profundo (do texto "Text") */
-    --secondary: 210 55% 23%;
-    /* #1A365D - Navy profundo */
+    /* Secondary: Azul Marinho (#22307F) */
+    --secondary: 228 57% 32%;
+    /* #22307F */
     --secondary-foreground: 0 0% 100%;
+    /* Branco */
 
-    /* Accent: Azul Intermediário */
-    --accent: 224 95% 65%;
-    /* #5481FA - Azul para highlights */
+    /* Accent: Variação do Primary */
+    --accent: 224 95% 70%;
+    /* #6B92FB - Mais claro */
     --accent-foreground: 0 0% 100%;
 
-    /* Muted: Cinza claro */
-    --muted: 210 20% 96%;
+    /* Muted: Cinzas neutros */
+    --muted: 220 20% 96%;
     /* #F5F6F8 */
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 220 15% 45%;
     /* #6B7280 */
 
-    /* Destructive: Vermelho */
-    --destructive: 0 84% 60%;
-    /* #EF4444 */
+    /* Destructive: Vermelho (#FF4D4D) */
+    --destructive: 0 100% 65%;
+    /* #FF4D4D */
     --destructive-foreground: 0 0% 100%;
 
-    /* Bordas e inputs */
-    --border: 210 20% 90%;
+    /* Bordas e Inputs */
+    --border: 220 20% 90%;
     /* #E5E8EB */
-    --input: 210 20% 90%;
-    --ring: 200 100% 50%;
-    /* Ciano para focus ring */
+    --input: 220 20% 90%;
+    --ring: 224 95% 65%;
+    /* Primary para focus */
 
-    /* Border radius */
+    /* Border Radius: Suave e moderno */
     --radius: 0.75rem;
-    /* 12px - Soft & Modern */
+    /* 12px */
 
-    /* === CORES PERSONALIZADAS TEXTFIX === */
+    /* === CORES UTILITÁRIAS === */
+
+    /* Success */
     --success: 142 71% 45%;
     /* #22C55E - Verde */
     --success-foreground: 0 0% 100%;
 
+    /* Warning */
     --warning: 38 92% 50%;
     /* #F59E0B - Laranja */
     --warning-foreground: 0 0% 100%;
 
+    /* Info */
     --info: 200 100% 50%;
-    /* #00A3FF - Ciano (mesma cor primary) */
+    /* #00A3FF - Ciano */
     --info-foreground: 0 0% 100%;
 
-    /* Cores adicionais do logo */
-    --ciano-light: 200 100% 60%;
-    /* #33B5FF - Hover states */
-    --navy-dark: 210 60% 15%;
-    /* #0F1F3D - Backgrounds escuros */
+    /* === ESCALA DE CORES CUSTOM === */
+
+    /* Primary Scale (Azul Hanami) */
+    --primary-50: 224 100% 97%;
+    /* #EEF2FF */
+    --primary-100: 224 100% 95%;
+    /* #E0E7FF */
+    --primary-200: 224 96% 89%;
+    /* #C7D2FE */
+    --primary-300: 224 96% 80%;
+    /* #A5B4FC */
+    --primary-400: 224 95% 72%;
+    /* #818CF8 */
+    --primary-500: 224 95% 65%;
+    /* #5481FA - Base */
+    --primary-600: 224 85% 55%;
+    /* #4F46E5 */
+    --primary-700: 224 75% 45%;
+    /* #4338CA */
+    --primary-800: 224 65% 35%;
+    /* #3730A3 */
+    --primary-900: 224 55% 25%;
+    /* #312E81 */
+
+    /* Secondary Scale (Azul Marinho) */
+    --secondary-50: 228 60% 95%;
+    /* #E8EAF6 */
+    --secondary-100: 228 60% 90%;
+    /* #C5CAE9 */
+    --secondary-200: 228 58% 80%;
+    /* #9FA8DA */
+    --secondary-300: 228 57% 65%;
+    /* #7986CB */
+    --secondary-400: 228 57% 50%;
+    /* #5C6BC0 */
+    --secondary-500: 228 57% 32%;
+    /* #22307F - Base */
+    --secondary-600: 228 60% 28%;
+    /* #1E2870 */
+    --secondary-700: 228 63% 24%;
+    /* #1A2260 */
+    --secondary-800: 228 65% 20%;
+    /* #151B50 */
+    --secondary-900: 228 68% 16%;
+    /* #101540 */
+
+    /* Neutral/Slate Scale */
+    --neutral-50: 220 20% 98%;
+    /* #F8FAFC */
+    --neutral-100: 220 15% 95%;
+    /* #F1F5F9 */
+    --neutral-200: 220 13% 91%;
+    /* #E2E8F0 */
+    --neutral-300: 220 13% 82%;
+    /* #CBD5E1 */
+    --neutral-400: 220 9% 64%;
+    /* #94A3B8 */
+    --neutral-500: 220 9% 46%;
+    /* #64748B */
+    --neutral-600: 220 13% 36%;
+    /* #475569 */
+    --neutral-700: 220 17% 27%;
+    /* #334155 */
+    --neutral-800: 220 23% 18%;
+    /* #1E293B - Base */
+    --neutral-900: 220 39% 11%;
+    /* #0F172A */
   }
 
+  /* Modo Escuro (opcional para futuro) */
   .dark {
-    --background: 210 55% 10%;
-    --foreground: 0 0% 98%;
+    --background: 220 39% 11%;
+    /* #0F172A */
+    --foreground: 220 20% 98%;
+    /* #F8FAFC */
 
-    --card: 210 55% 15%;
-    --card-foreground: 0 0% 98%;
+    --card: 220 23% 18%;
+    /* #1E293B */
+    --card-foreground: 220 20% 98%;
 
-    --popover: 210 55% 15%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 220 23% 18%;
+    --popover-foreground: 220 20% 98%;
 
-    --primary: 200 100% 50%;
-    /* Ciano mantém em dark mode */
+    --primary: 224 95% 65%;
+    /* Mantém #5481FA */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 55% 20%;
+    --secondary: 228 57% 40%;
+    /* Mais claro no dark */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 20%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 23% 20%;
+    --muted-foreground: 220 13% 65%;
 
-    --accent: 224 95% 60%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 224 95% 70%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 100% 65%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 40% 20%;
-    --input: 210 40% 20%;
-    --ring: 200 100% 50%;
+    --border: 220 23% 25%;
+    --input: 220 23% 25%;
+    --ring: 224 95% 65%;
   }
 }
 
@@ -118,56 +198,131 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
-  }
-}
-
-/* Animaciones para Toasts */
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideOutRight {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-.animate-in {
-  animation: slideInRight 0.3s ease-out;
-}
-
-.animate-out {
-  animation: slideOutRight 0.2s ease-in;
-}
-
-/* Mejoras responsive */
-@media (max-width: 640px) {
-
-  /* Ajustes para mobile */
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  /* Tipografia Base */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold;
+    line-height: 1.2;
   }
 
-  /* Touch targets maiores */
-  button,
-  a {
-    min-height: 44px;
-    min-width: 44px;
+  h1 {
+    @apply text-4xl font-bold;
+  }
+
+  h2 {
+    @apply text-3xl font-bold;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+
+  h4 {
+    @apply text-xl font-semibold;
+  }
+
+  h5 {
+    @apply text-lg font-medium;
+  }
+
+  h6 {
+    @apply text-base font-medium;
+  }
+
+  p {
+    @apply text-base;
+    line-height: 1.6;
+  }
+
+  /* Estilos para contentEditable */
+  [contenteditable="true"] {
+    outline: none;
+  }
+
+  [contenteditable="true"]:focus {
+    @apply ring-2 ring-primary ring-offset-2;
+  }
+
+  /* Placeholder para contentEditable */
+  [contenteditable="true"]:empty:before {
+    content: attr(data-placeholder);
+    @apply text-muted-foreground;
+    pointer-events: none;
+  }
+
+  /* Estilos de listas para contentEditable */
+  [contenteditable="true"] ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+
+  [contenteditable="true"] ol {
+    list-style-type: decimal;
+    list-style-position: inside;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+
+  [contenteditable="true"] li {
+    display: list-item;
+    margin: 0.25rem 0;
+  }
+
+  [contenteditable="true"] ul li::marker {
+    color: hsl(var(--primary));
+    font-size: 0.875em;
+  }
+
+  [contenteditable="true"] ol li::marker {
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  /* Scrollbar personalizado */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-400;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-500;
+  }
+
+  /* Modo de alto contraste */
+  .high-contrast {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --border: 0 0% 0%;
+  }
+
+  /* Modo preto e branco */
+  .grayscale {
+    filter: grayscale(100%);
   }
 }
