@@ -43,9 +43,12 @@ export function AccessibilityControls() {
 
     /**
      * Aplica tamanho de fonte ao documento
-     * Atualiza a variável CSS --base-font-size
+     * Atualiza o fontSize do body e a variável CSS
      */
     const applyFontSize = (size: number) => {
+        // Aplica ao body para afetar todo o documento
+        document.body.style.fontSize = `${size}px`
+        // Também define a variável CSS para uso em componentes
         document.documentElement.style.setProperty('--base-font-size', `${size}px`)
     }
 
@@ -173,8 +176,8 @@ export function AccessibilityControls() {
                 size="sm"
                 onClick={toggleHighContrast}
                 className={`h-8 w-8 sm:h-9 sm:w-9 p-0 ${highContrast
-                        ? 'bg-foreground text-background hover:bg-foreground/90'
-                        : 'hover:bg-primary/10'
+                    ? 'bg-foreground text-background hover:bg-foreground/90'
+                    : 'hover:bg-primary/10'
                     }`}
                 title={highContrast ? "Desativar alto contraste" : "Ativar alto contraste (preto e branco)"}
                 aria-label={`${highContrast ? 'Desativar' : 'Ativar'} modo de alto contraste`}
@@ -189,8 +192,8 @@ export function AccessibilityControls() {
                 size="sm"
                 onClick={toggleGrayscale}
                 className={`h-8 w-8 sm:h-9 sm:w-9 p-0 ${grayscale
-                        ? 'bg-neutral-600 text-white hover:bg-neutral-700'
-                        : 'hover:bg-primary/10'
+                    ? 'bg-neutral-600 text-white hover:bg-neutral-700'
+                    : 'hover:bg-primary/10'
                     }`}
                 title={grayscale ? "Desativar escala de cinza" : "Ativar escala de cinza"}
                 aria-label={`${grayscale ? 'Desativar' : 'Ativar'} modo escala de cinza`}
