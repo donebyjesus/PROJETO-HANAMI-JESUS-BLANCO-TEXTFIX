@@ -1,274 +1,378 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-    Copy,
-    Trash2,
-    BookOpen,
-    MessageSquare
+    Copy, Trash2, BookOpen, MessageSquare, Bold, Italic, Underline,
+    List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+    Highlighter, Palette, Eraser, Undo, Redo, AlignVerticalSpaceAround,
+    Save, Clock, X
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
 
 /**
- * Componente principal TextFix - Formatador de Texto
- * Conceito: "Ordem a partir do Caos"
- * Identidade visual baseada no logo TextFix
+ * Interface para textos salvos
+ * Armazena o conteúdo HTML, texto plano e timestamp
+ */
+interface SavedText {
+    id: string
+    content: string
+    plainText: string
+    timestamp: number
+}
+
+/**
+ * Componente TextEditor - Editor de Texto Rico
+ * 
+ * Funcionalidades:
+ * - Editor contentEditable com formatação em tempo real
+ * - 12 fontes disponíveis
+ * - Tamanhos de 8px a 100px
+ * - Interlineado personalizável (6 opções)
+ * - Formatação: Negrito, Itálico, Sublinhado
+ * - Listas: Marcadores e Numeradas
+ * - Alinhamento: Esquerda, Centro, Direita, Justificado
+ * - Cores: Texto e Destaque
+ * - Histórico: Desfazer/Refazer (Ctrl+Z/Ctrl+Y)
+ * - Transformações: MAIÚSCULAS, minúsculas, Primeira Letra, Remover espaços
+ * - Textos salvos: Últimos 5 com timestamp
+ * - Toolbar sticky responsiva
+ * - Atalhos de teclado
  */
 export function TextEditor() {
+    // Estados do editor
     const [text, setText] = useState('')
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const [selectedFont, setSelectedFont] = useState('Arial')
+    const [fontSize, setFontSize] = useState('16')
+    const [lineHeight, setLineHeight] = useState('1.5')
+    const [textColor, setTextColor] = useState('#000000')
+    const [highlightColor, setHighlightColor] = useState('#FFFF00')
+
+    // Estados do histórico
+    const [history, setHistory] = useState<string[]>([])
+    const [historyIndex, setHistoryIndex] = useState(-1)
+    const [showHistoryPopup, setShowHistoryPopup] = useState(false)
+
+    // Estados dos textos salvos
+    const [showSavedTexts, setShowSavedTexts] = useState(false)
+    const [savedTexts, setSavedTexts] = useState<SavedText[]>([])
+
+    const editorRef = useRef<HTMLDivElement>(null)
     const { success, error } = useToast()
 
-    // Carrega o texto salvo do localStorage ao montar o componente
+    // Opções de fontes disponíveis
+    const fonts = ['Arial', 'Times New Roman', 'Georgia', 'Courier New', 'Verdana', 'Helvetica', 'Comic Sans MS', 'Impact', 'Trebuchet MS', 'Palatino', 'Garamond', 'Bookman']
+
+    // Tamanhos de fonte de 8px a 100px
+    const fontSizes = ['8', '10', '12', '14', '16', '18', '20', '22', '24', '28', '32', '36', '40', '48', '56', '64', '72', '80', '88', '96', '100']
+
+    // Opções de interlineado
+    const lineHeights = [
+        { value: '1', label: 'Simples' },
+        { value: '1.15', label: '1.15' },
+        { value: '1.5', label: '1.5' },
+        { value: '2', label: 'Duplo' },
+        { value: '2.5', label: '2.5' },
+        { value: '3', label: 'Triplo' }
+    ]
+
+    // Carrega texto salvo e lista de textos ao montar o componente
     useEffect(() => {
         const savedText = localStorage.getItem('textfix-text')
-        if (savedText) {
-            setText(savedText)
+        const savedTextsList = localStorage.getItem('textfix-saved-texts')
+        if (savedTextsList) setSavedTexts(JSON.parse(savedTextsList))
+        if (savedText && editorRef.current) {
+            editorRef.current.innerHTML = savedText
+            setHistory([savedText])
+            setHistoryIndex(0)
         }
-        // Auto-focus no textarea para acessibilidade
-        textareaRef.current?.focus()
+        editorRef.current?.focus()
     }, [])
 
-    // Salva o texto no localStorage sempre que mudar
+    // Gerencia atalhos de teclado (Ctrl+B/I/U/Z/Y/S)
     useEffect(() => {
-        localStorage.setItem('textfix-text', text)
-    }, [text])
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'b': e.preventDefault(); executeCommand('bold'); break
+                    case 'i': e.preventDefault(); executeCommand('italic'); break
+                    case 'u': e.preventDefault(); executeCommand('underline'); break
+                    case 'z': e.preventDefault(); handleUndo(); break
+                    case 'y': e.preventDefault(); handleRedo(); break
+                    case 's': e.preventDefault(); handleSaveText(); break
+                }
+            }
+        }
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [historyIndex, history])
 
     /**
-     * Converte todo o texto para MAIÚSCULAS
+     * Salva o conteúdo atual no histórico
+     * Remove itens futuros se estiver no meio do histórico
      */
-    const handleUppercase = () => {
-        setText(text.toUpperCase())
+    const saveToHistory = (content: string) => {
+        const newHistory = history.slice(0, historyIndex + 1)
+        newHistory.push(content)
+        setHistory(newHistory)
+        setHistoryIndex(newHistory.length - 1)
     }
 
     /**
-     * Converte todo o texto para minúsculas
+     * Desfaz a última alteração (Ctrl+Z)
+     * Volta um passo no histórico
      */
-    const handleLowercase = () => {
-        setText(text.toLowerCase())
+    const handleUndo = () => {
+        if (historyIndex > 0 && editorRef.current) {
+            const newIndex = historyIndex - 1
+            setHistoryIndex(newIndex)
+            editorRef.current.innerHTML = history[newIndex]
+            setText(editorRef.current.innerText)
+        }
     }
 
     /**
-     * Converte a primeira letra de cada frase para maiúscula
-     * Mantém o resto em minúsculas
+     * Refaz a última alteração desfeita (Ctrl+Y)
+     * Avança um passo no histórico
      */
-    const handleSentenceCase = () => {
-        const result = text
-            .toLowerCase()
-            .replace(/(^\s*\w|[.!?]\s*\w)/g, (match) => match.toUpperCase())
-        setText(result)
+    const handleRedo = () => {
+        if (historyIndex < history.length - 1 && editorRef.current) {
+            const newIndex = historyIndex + 1
+            setHistoryIndex(newIndex)
+            editorRef.current.innerHTML = history[newIndex]
+            setText(editorRef.current.innerText)
+        }
     }
 
     /**
-     * Remove espaços extras entre palavras e quebras de linha duplas
-     * Mantém apenas um espaço entre palavras e uma quebra de linha entre parágrafos
+     * Manipula entrada de texto no editor
+     * Salva no localStorage e adiciona ao histórico
      */
-    const handleRemoveExtraSpaces = () => {
-        const result = text
-            .replace(/[ \t]+/g, ' ') // Remove espaços e tabs extras
-            .replace(/\n\s*\n\s*\n/g, '\n\n') // Remove quebras de linha triplas ou mais
-            .trim()
-        setText(result)
+    const handleInput = () => {
+        if (editorRef.current) {
+            const content = editorRef.current.innerHTML
+            localStorage.setItem('textfix-text', content)
+            setText(editorRef.current.innerText)
+            saveToHistory(content)
+        }
     }
 
     /**
-     * Limpa todo o conteúdo do editor
+     * Executa comandos de formatação do contentEditable
+     * @param command - Comando a ser executado (bold, italic, etc)
+     * @param value - Valor opcional para o comando
      */
-    const handleClear = () => {
-        setText('')
-        textareaRef.current?.focus()
+    const executeCommand = (command: string, value?: string) => {
+        document.execCommand(command, false, value)
+        editorRef.current?.focus()
+        handleInput()
+    }
+
+    /**
+     * Aplica transformações de texto preservando a formatação HTML
+     * Percorre recursivamente todos os nós de texto
+     * @param transformer - Função que transforma o texto
+     */
+    const transformTextPreservingFormat = (transformer: (text: string) => string) => {
+        if (!editorRef.current) return
+        const processNode = (node: Node): void => {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent) {
+                node.textContent = transformer(node.textContent)
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                Array.from(node.childNodes).forEach(processNode)
+            }
+        }
+        processNode(editorRef.current)
+        handleInput()
+    }
+
+    /**
+     * Salva o texto atual na lista de textos salvos
+     * Mantém apenas os últimos 5 textos
+     */
+    const handleSaveText = () => {
+        if (!editorRef.current || !text.trim()) {
+            error('Erro', 'Não há texto para salvar')
+            return
+        }
+        const newSavedText: SavedText = {
+            id: Date.now().toString(),
+            content: editorRef.current.innerHTML,
+            plainText: text.trim().substring(0, 100) + (text.length > 100 ? '...' : ''),
+            timestamp: Date.now()
+        }
+        const updatedTexts = [newSavedText, ...savedTexts].slice(0, 5)
+        setSavedTexts(updatedTexts)
+        localStorage.setItem('textfix-saved-texts', JSON.stringify(updatedTexts))
+        success('Texto salvo!', 'Adicionado à lista de textos salvos')
+    }
+
+    /**
+     * Carrega um texto salvo no editor
+     * Restaura o conteúdo HTML completo com formatação
+     */
+    const handleLoadText = (savedText: SavedText) => {
+        if (editorRef.current) {
+            editorRef.current.innerHTML = savedText.content
+            setText(editorRef.current.innerText)
+            saveToHistory(savedText.content)
+            setShowSavedTexts(false)
+            success('Texto carregado!', 'Texto restaurado com sucesso')
+        }
     }
 
     /**
      * Copia o texto para a área de transferência
-     * Mostra feedback via Toast notification
+     * Usa a API clipboard do navegador
      */
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(text)
-            success('Texto copiado!', `${wordCount} palavras copiadas com sucesso`)
-        } catch (err) {
+            if (editorRef.current) {
+                await navigator.clipboard.writeText(editorRef.current.innerText)
+                success('Texto copiado!', `${wordCount} palavras copiadas`)
+            }
+        } catch {
             error('Erro ao copiar', 'Não foi possível copiar o texto')
         }
     }
 
-    /**
-     * Calcula estatísticas do texto
-     */
+    // Calcula estatísticas do texto: palavras, caracteres e tempo de leitura
     const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
     const charCount = text.length
-    // Estimativa: 200 palavras por minuto
-    const readingTime = Math.ceil(wordCount / 200)
+    const readingTime = Math.ceil(wordCount / 200) // 200 palavras por minuto
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-4xl"
-            >
-                <Card className="overflow-hidden shadow-2xl">
-                    {/* Header com gradiente TextFix: Ciano → Navy */}
-                    <CardHeader className="bg-gradient-to-r from-[#00A3FF] to-[#1A365D] text-white">
-                        <CardTitle className="flex items-center gap-4">
-                            {/* Logo TextFix */}
-                            <img
-                                src="/icon-textfix.svg"
-                                alt="Logo TextFix"
-                                className="w-10 h-10"
-                                aria-hidden="true"
-                            />
-                            <div>
-                                <h1 className="text-3xl font-bold">TextFix</h1>
-                                <p className="text-sm font-normal text-white/90 mt-1">
-                                    Formatador de Texto Premium
-                                </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full">
+            <Card className="overflow-visible shadow-2xl">
+                <CardContent className="p-0">
+                    {/* Toolbar Sticky */}
+                    <div className="sticky top-[80px] z-20 bg-white border-b shadow-md">
+                        <div className="p-3 sm:p-4 space-y-3">
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2 items-center text-xs sm:text-sm">
+                                <div className="flex gap-1">
+                                    <Button onClick={handleUndo} variant="outline" size="sm" disabled={historyIndex <= 0} title="Desfazer (Ctrl+Z)" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10">
+                                        <Undo className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                                    </Button>
+                                    <Button onClick={handleRedo} variant="outline" size="sm" disabled={historyIndex >= history.length - 1} title="Refazer (Ctrl+Y)" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10">
+                                        <Redo className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                                    </Button>
+                                </div>
+                                <div className="w-px h-5 sm:h-6 bg-border"></div>
+                                <select value={selectedFont} onChange={(e) => { setSelectedFont(e.target.value); executeCommand('fontName', e.target.value) }} className="px-1.5 sm:px-2 py-1 sm:py-1.5 border rounded-lg bg-background text-[10px] sm:text-xs min-w-[90px] sm:min-w-[110px]" title="Tipo de fonte">
+                                    {fonts.map(f => <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>)}
+                                </select>
+                                <select value={fontSize} onChange={(e) => { setFontSize(e.target.value); executeCommand('fontSize', '7') }} className="px-1.5 sm:px-2 py-1 sm:py-1.5 border rounded-lg bg-background text-[10px] sm:text-xs w-[50px] sm:w-[60px]" title="Tamanho">
+                                    {fontSizes.map(s => <option key={s} value={s}>{s}px</option>)}
+                                </select>
+                                <div className="flex items-center gap-0.5 sm:gap-1">
+                                    <AlignVerticalSpaceAround className="w-3 h-3 text-muted-foreground hidden sm:block" />
+                                    <select value={lineHeight} onChange={(e) => { setLineHeight(e.target.value); if (editorRef.current) editorRef.current.style.lineHeight = e.target.value }} className="px-1.5 sm:px-2 py-1 sm:py-1.5 border rounded-lg bg-background text-[10px] sm:text-xs w-[60px] sm:w-[75px]" title="Interlineado">
+                                        {lineHeights.map(lh => <option key={lh.value} value={lh.value}>{lh.label}</option>)}
+                                    </select>
+                                </div>
+                                <div className="w-px h-5 sm:h-6 bg-border hidden sm:block"></div>
+                                <div className="flex items-center gap-0.5 sm:gap-1">
+                                    <Palette className="w-3 h-3 text-muted-foreground hidden sm:block" />
+                                    <input type="color" value={textColor} onChange={(e) => { setTextColor(e.target.value); executeCommand('foreColor', e.target.value) }} className="w-7 sm:w-8 h-6 sm:h-7 border rounded cursor-pointer" title="Cor do texto" />
+                                </div>
+                                <div className="flex items-center gap-0.5 sm:gap-1">
+                                    <Highlighter className="w-3 h-3 text-muted-foreground hidden sm:block" />
+                                    <input type="color" value={highlightColor} onChange={(e) => { setHighlightColor(e.target.value); executeCommand('backColor', e.target.value) }} className="w-7 sm:w-8 h-6 sm:h-7 border rounded cursor-pointer" title="Cor de destaque" />
+                                </div>
                             </div>
-                        </CardTitle>
-                    </CardHeader>
-
-                    <CardContent className="p-6 space-y-6">
-                        {/* Área de texto principal */}
-                        <div>
-                            <label htmlFor="text-editor" className="sr-only">
-                                Área de edição de texto
-                            </label>
-                            <Textarea
-                                id="text-editor"
-                                ref={textareaRef}
-                                value={text}
-                                onChange={(e) => setText(e.target.value)}
-                                placeholder="Cole ou digite seu texto aqui..."
-                                className="min-h-[300px] text-base resize-y focus:ring-[#00A3FF] focus:border-[#00A3FF]"
-                                aria-label="Editor de texto principal"
-                                aria-describedby="text-stats"
-                            />
+                            <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                                <Button onClick={() => executeCommand('bold')} variant="outline" size="sm" title="Negrito (Ctrl+B)" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><Bold className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <Button onClick={() => executeCommand('italic')} variant="outline" size="sm" title="Itálico (Ctrl+I)" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><Italic className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <Button onClick={() => executeCommand('underline')} variant="outline" size="sm" title="Sublinhado (Ctrl+U)" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><Underline className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <div className="w-px h-5 sm:h-6 bg-border"></div>
+                                <Button onClick={() => executeCommand('insertUnorderedList')} variant="outline" size="sm" title="Lista com marcadores" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><List className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <Button onClick={() => executeCommand('insertOrderedList')} variant="outline" size="sm" title="Lista numerada" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><ListOrdered className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <div className="w-px h-5 sm:h-6 bg-border"></div>
+                                <Button onClick={() => executeCommand('justifyLeft')} variant="outline" size="sm" title="Alinhar à esquerda" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><AlignLeft className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <Button onClick={() => executeCommand('justifyCenter')} variant="outline" size="sm" title="Centralizar" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><AlignCenter className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <Button onClick={() => executeCommand('justifyRight')} variant="outline" size="sm" title="Alinhar à direita" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><AlignRight className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <Button onClick={() => executeCommand('justifyFull')} variant="outline" size="sm" title="Justificar" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><AlignJustify className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <div className="w-px h-5 sm:h-6 bg-border"></div>
+                                <Button onClick={() => transformTextPreservingFormat(t => t.toUpperCase())} variant="outline" size="sm" disabled={!text} title="MAIÚSCULAS" className="h-7 sm:h-8 px-1.5 sm:px-2 text-[10px] sm:text-xs font-bold hover:bg-primary/10">AA</Button>
+                                <Button onClick={() => transformTextPreservingFormat(t => t.toLowerCase())} variant="outline" size="sm" disabled={!text} title="minúsculas" className="h-7 sm:h-8 px-1.5 sm:px-2 text-[10px] sm:text-xs hover:bg-primary/10">aa</Button>
+                                <Button onClick={() => transformTextPreservingFormat(t => t.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, m => m.toUpperCase()))} variant="outline" size="sm" disabled={!text} title="Primeira Letra" className="h-7 sm:h-8 px-1.5 sm:px-2 text-[10px] sm:text-xs hover:bg-primary/10">Aa</Button>
+                                <Button onClick={() => transformTextPreservingFormat(t => t.replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*\n/g, '\n\n').trim())} variant="outline" size="sm" disabled={!text} title="Remover espaços" className="h-7 sm:h-8 px-1.5 sm:px-2 hover:bg-primary/10"><Eraser className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                                <Button onClick={() => { if (editorRef.current) { editorRef.current.innerHTML = ''; setText(''); localStorage.removeItem('textfix-text'); saveToHistory('') } }} variant="destructive" size="sm" disabled={!text} title="Limpar tudo" className="h-7 sm:h-8 px-1.5 sm:px-2"><Trash2 className="w-3 sm:w-3.5 h-3 sm:h-3.5" /></Button>
+                            </div>
+                            <div className="hidden sm:block text-[10px] text-muted-foreground bg-muted/30 px-2 py-1 rounded">
+                                💡 <strong>Atalhos:</strong> Ctrl+B (Negrito) | Ctrl+I (Itálico) | Ctrl+U (Sublinhado) | Ctrl+Z (Desfazer) | Ctrl+Y (Refazer) | Ctrl+S (Salvar)
+                            </div>
                         </div>
+                    </div>
 
-                        {/* Barra de estatísticas */}
-                        <div
-                            id="text-stats"
-                            className="flex flex-wrap gap-3"
-                            role="status"
-                            aria-live="polite"
-                        >
-                            <Badge
-                                variant="outline"
-                                className="text-sm px-4 py-2 border-primary/30 text-primary"
-                                aria-label={`${wordCount} palavras`}
-                            >
-                                <MessageSquare className="w-4 h-4 mr-2" aria-hidden="true" />
-                                {wordCount} Palavras
-                            </Badge>
-                            <Badge
-                                variant="outline"
-                                className="text-sm px-4 py-2 border-primary/30 text-primary"
-                                aria-label={`${charCount} caracteres`}
-                            >
-                                📝 {charCount} Caracteres
-                            </Badge>
-                            <Badge
-                                variant="outline"
-                                className="text-sm px-4 py-2 border-primary/30 text-primary"
-                                aria-label={`Tempo de leitura estimado: ${readingTime} ${readingTime === 1 ? 'minuto' : 'minutos'}`}
-                            >
-                                <BookOpen className="w-4 h-4 mr-2" aria-hidden="true" />
-                                {readingTime} min de leitura
-                            </Badge>
-                        </div>
+                    <div className="p-6 space-y-6">
+                        <div contentEditable ref={editorRef} onInput={handleInput} className="min-h-[400px] p-4 border-2 border-primary/30 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary text-base overflow-auto" style={{ fontFamily: selectedFont, lineHeight }} data-placeholder="Cole ou digite seu texto aqui..." />
 
-                        {/* Barra de ações de formatação */}
-                        <div className="space-y-3">
-                            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                                Ações de Formatação
-                            </h3>
-                            <div className="flex flex-wrap gap-2">
-                                <Button
-                                    onClick={handleUppercase}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={!text}
-                                    aria-label="Converter texto para maiúsculas"
-                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
-                                >
-                                    MAIÚSCULAS
-                                </Button>
-                                <Button
-                                    onClick={handleLowercase}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={!text}
-                                    aria-label="Converter texto para minúsculas"
-                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
-                                >
-                                    minúsculas
-                                </Button>
-                                <Button
-                                    onClick={handleSentenceCase}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={!text}
-                                    aria-label="Converter primeira letra de cada frase para maiúscula"
-                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
-                                >
-                                    Primeira Letra em Maiúscula
-                                </Button>
-                                <Button
-                                    onClick={handleRemoveExtraSpaces}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={!text}
-                                    aria-label="Remover espaços extras e quebras de linha duplas"
-                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
-                                >
-                                    Remover Espaços Extras
-                                </Button>
-                                <Button
-                                    onClick={handleClear}
-                                    variant="destructive"
-                                    size="sm"
-                                    disabled={!text}
-                                    aria-label="Limpar todo o texto"
-                                    className="hover:scale-105 transition-transform"
-                                >
-                                    <Trash2 className="w-4 h-4 mr-2" aria-hidden="true" />
-                                    Limpar Tudo
-                                </Button>
+                        <div className="flex flex-wrap gap-3 relative">
+                            <Badge variant="outline" className="text-sm px-4 py-2 border-primary/30 text-primary"><MessageSquare className="w-4 h-4 mr-2" />{wordCount} Palavras</Badge>
+                            <Badge variant="outline" className="text-sm px-4 py-2 border-primary/30 text-primary">📝 {charCount} Caracteres</Badge>
+                            <Badge variant="outline" className="text-sm px-4 py-2 border-primary/30 text-primary"><BookOpen className="w-4 h-4 mr-2" />{readingTime} min</Badge>
+
+                            <div className="relative">
+                                <Badge variant="outline" className="text-sm px-4 py-2 border-accent/30 text-accent cursor-pointer hover:bg-accent/10" onClick={() => setShowHistoryPopup(!showHistoryPopup)} title="Ver histórico">📜 {history.length} mudanças</Badge>
+                                <AnimatePresence>
+                                    {showHistoryPopup && (
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute bottom-full mb-2 right-0 bg-white border shadow-lg rounded-lg p-3 w-64 z-30">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="text-xs font-semibold">Histórico</h4>
+                                                <Button variant="ghost" size="sm" onClick={() => setShowHistoryPopup(false)} className="h-5 w-5 p-0"><X className="w-3 h-3" /></Button>
+                                            </div>
+                                            <div className="max-h-48 overflow-y-auto space-y-1">
+                                                {history.slice().reverse().map((_, idx) => {
+                                                    const actualIdx = history.length - 1 - idx
+                                                    return <div key={idx} className={`text-xs p-1.5 rounded ${actualIdx === historyIndex ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground'}`}>{actualIdx === historyIndex ? '→ ' : '  '}Mudança #{actualIdx + 1}</div>
+                                                })}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            <div className="relative">
+                                <Badge variant="outline" className="text-sm px-4 py-2 border-secondary/30 text-secondary cursor-pointer hover:bg-secondary/10" onClick={() => setShowSavedTexts(!showSavedTexts)} title="Ver textos salvos"><Clock className="w-4 h-4 mr-2" />{savedTexts.length} salvos</Badge>
+                                <AnimatePresence>
+                                    {showSavedTexts && (
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute bottom-full mb-2 right-0 bg-white border shadow-lg rounded-lg p-3 w-80 z-30">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="text-xs font-semibold">Últimos 5 Textos</h4>
+                                                <Button variant="ghost" size="sm" onClick={() => setShowSavedTexts(false)} className="h-5 w-5 p-0"><X className="w-3 h-3" /></Button>
+                                            </div>
+                                            {savedTexts.length === 0 ? (
+                                                <p className="text-xs text-muted-foreground text-center py-4">Nenhum texto salvo</p>
+                                            ) : (
+                                                <div className="max-h-64 overflow-y-auto space-y-2">
+                                                    {savedTexts.map(saved => (
+                                                        <div key={saved.id} className="border rounded p-2 hover:bg-muted/50 group">
+                                                            <div className="flex justify-between items-start gap-2">
+                                                                <button onClick={() => handleLoadText(saved)} className="flex-1 text-left">
+                                                                    <p className="text-xs text-foreground line-clamp-2">{saved.plainText}</p>
+                                                                    <p className="text-[10px] text-muted-foreground mt-1">{new Date(saved.timestamp).toLocaleString('pt-BR')}</p>
+                                                                </button>
+                                                                <Button variant="ghost" size="sm" onClick={() => { const updated = savedTexts.filter(t => t.id !== saved.id); setSavedTexts(updated); localStorage.setItem('textfix-saved-texts', JSON.stringify(updated)) }} className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100" title="Deletar"><Trash2 className="w-3 h-3 text-destructive" /></Button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
 
-                        {/* Botão de copiar com cores TextFix */}
-                        <div className="pt-4 border-t">
-                            <Button
-                                onClick={handleCopy}
-                                disabled={!text}
-                                size="lg"
-                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all"
-                                aria-label="Copiar texto para área de transferência"
-                            >
-                                <Copy className="w-5 h-5 mr-2" aria-hidden="true" />
-                                Copiar Texto
-                            </Button>
+                        <div className="pt-4 border-t flex flex-wrap gap-2">
+                            <Button onClick={handleSaveText} disabled={!text} size="lg" variant="outline" className="hover:bg-secondary/10 hover:text-secondary" title="Salvar texto (Ctrl+S)"><Save className="w-5 h-5 mr-2" />Salvar Texto</Button>
+                            <Button onClick={handleCopy} disabled={!text} size="lg" className="bg-primary hover:bg-primary/90 text-white shadow-lg" title="Copiar texto"><Copy className="w-5 h-5 mr-2" />Copiar Texto</Button>
                         </div>
-                    </CardContent>
-                </Card>
-
-                {/* Footer com créditos */}
-                <motion.footer
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-center mt-8 text-sm text-muted-foreground"
-                >
-                    <p>
-                        Desenvolvido com ❤️ para máxima acessibilidade
-                    </p>
-                </motion.footer>
-            </motion.div>
-        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
     )
 }
