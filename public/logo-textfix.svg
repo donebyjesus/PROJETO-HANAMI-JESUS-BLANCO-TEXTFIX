@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" fill="none">
+  <!-- Conceito: "Ordem a partir do Caos" -->
+  <!-- Lado Esquerdo: Ondas Desordenadas (Caos) -->
+  <g id="chaos">
+    <!-- Ondas em Navy (#1A365D) -->
+    <path d="M 50 60 Q 70 40, 90 60 T 130 60" stroke="#1A365D" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 50 90 Q 70 70, 90 90 T 130 90" stroke="#1A365D" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 50 120 Q 70 100, 90 120 T 130 120" stroke="#1A365D" stroke-width="8" fill="none" stroke-linecap="round"/>
+    
+    <!-- Elementos desordenados -->
+    <rect x="140" y="50" width="15" height="15" fill="#1A365D" transform="rotate(15 147.5 57.5)"/>
+    <rect x="140" y="80" width="15" height="15" fill="#1A365D" transform="rotate(-20 147.5 87.5)"/>
+    <rect x="140" y="110" width="15" height="15" fill="#1A365D" transform="rotate(25 147.5 117.5)"/>
+    <rect x="140" y="140" width="15" height="15" fill="#1A365D" transform="rotate(-10 147.5 147.5)"/>
+  </g>
+  
+  <!-- Transição -->
+  <g id="transition">
+    <rect x="170" y="60" width="12" height="12" fill="#5481FA" transform="rotate(10 176 66)"/>
+    <rect x="170" y="90" width="12" height="12" fill="#5481FA" transform="rotate(-5 176 96)"/>
+    <rect x="170" y="120" width="12" height="12" fill="#5481FA"/>
+    
+    <rect x="190" y="70" width="12" height="12" fill="#00A3FF" transform="rotate(5 196 76)"/>
+    <rect x="190" y="100" width="12" height="12" fill="#00A3FF"/>
+    <rect x="190" y="130" width="12" height="12" fill="#00A3FF"/>
+  </g>
+  
+  <!-- Lado Direito: Grade Organizada (Ordem) em Ciano -->
+  <g id="order">
+    <!-- Grade perfeita 4x4 em Ciano (#00A3FF) -->
+    <rect x="220" y="50" width="25" height="25" fill="#00A3FF"/>
+    <rect x="250" y="50" width="25" height="25" fill="#00A3FF"/>
+    <rect x="280" y="50" width="25" height="25" fill="#00A3FF"/>
+    <rect x="310" y="50" width="25" height="25" fill="#00A3FF"/>
+    
+    <rect x="220" y="80" width="25" height="25" fill="#00A3FF"/>
+    <rect x="250" y="80" width="25" height="25" fill="#00A3FF"/>
+    <rect x="280" y="80" width="25" height="25" fill="#00A3FF"/>
+    <rect x="310" y="80" width="25" height="25" fill="#00A3FF"/>
+    
+    <rect x="220" y="110" width="25" height="25" fill="#00A3FF"/>
+    <rect x="250" y="110" width="25" height="25" fill="#00A3FF"/>
+    <rect x="280" y="110" width="25" height="25" fill="#00A3FF"/>
+    <rect x="310" y="110" width="25" height="25" fill="#00A3FF"/>
+    
+    <rect x="220" y="140" width="25" height="25" fill="#00A3FF"/>
+    <rect x="250" y="140" width="25" height="25" fill="#00A3FF"/>
+    <rect x="280" y="140" width="25" height="25" fill="#00A3FF"/>
+    <rect x="310" y="140" width="25" height="25" fill="#00A3FF"/>
+  </g>
+  
+  <!-- Texto "TextFix" -->
+  <g id="text">
+    <!-- "Text" em Navy (#1A365D) -->
+    <text x="370" y="110" font-family="Poppins, sans-serif" font-size="60" font-weight="700" fill="#1A365D">Text</text>
+    
+    <!-- "Fix" em Ciano (#00A3FF) -->
+    <text x="530" y="110" font-family="Poppins, sans-serif" font-size="60" font-weight="700" fill="#00A3FF">Fix</text>
+  </g>
+</svg>

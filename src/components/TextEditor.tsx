@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import {
-    Type,
     Copy,
     Trash2,
-    Check,
     BookOpen,
     MessageSquare
 } from 'lucide-react'
@@ -12,19 +10,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { useToast } from '@/components/ui/use-toast'
 
 /**
- * Componente principal do editor de texto Hanami
- * Fornece formatação de texto com alta acessibilidade
+ * Componente principal TextFix - Formatador de Texto
+ * Conceito: "Ordem a partir do Caos"
+ * Identidade visual baseada no logo TextFix
  */
 export function TextEditor() {
     const [text, setText] = useState('')
-    const [copied, setCopied] = useState(false)
     const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const { success, error } = useToast()
 
     // Carrega o texto salvo do localStorage ao montar o componente
     useEffect(() => {
-        const savedText = localStorage.getItem('hanami-text')
+        const savedText = localStorage.getItem('textfix-text')
         if (savedText) {
             setText(savedText)
         }
@@ -34,7 +34,7 @@ export function TextEditor() {
 
     // Salva o texto no localStorage sempre que mudar
     useEffect(() => {
-        localStorage.setItem('hanami-text', text)
+        localStorage.setItem('textfix-text', text)
     }, [text])
 
     /**
@@ -84,15 +84,14 @@ export function TextEditor() {
 
     /**
      * Copia o texto para a área de transferência
-     * Mostra feedback visual por 2 segundos
+     * Mostra feedback via Toast notification
      */
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(text)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 2000)
+            success('Texto copiado!', `${wordCount} palavras copiadas com sucesso`)
         } catch (err) {
-            console.error('Erro ao copiar texto:', err)
+            error('Erro ao copiar', 'Não foi possível copiar o texto')
         }
     }
 
@@ -112,15 +111,24 @@ export function TextEditor() {
                 transition={{ duration: 0.5 }}
                 className="w-full max-w-4xl"
             >
-                <Card className="overflow-hidden">
-                    <CardHeader className="bg-gradient-to-r from-primary to-secondary text-white">
-                        <CardTitle className="flex items-center gap-3 text-3xl">
-                            <Type className="w-8 h-8" aria-hidden="true" />
-                            <span>Hanami Text Formatter</span>
+                <Card className="overflow-hidden shadow-2xl">
+                    {/* Header com gradiente TextFix: Ciano → Navy */}
+                    <CardHeader className="bg-gradient-to-r from-[#00A3FF] to-[#1A365D] text-white">
+                        <CardTitle className="flex items-center gap-4">
+                            {/* Logo TextFix */}
+                            <img
+                                src="/icon-textfix.svg"
+                                alt="Logo TextFix"
+                                className="w-10 h-10"
+                                aria-hidden="true"
+                            />
+                            <div>
+                                <h1 className="text-3xl font-bold">TextFix</h1>
+                                <p className="text-sm font-normal text-white/90 mt-1">
+                                    Formatador de Texto Premium
+                                </p>
+                            </div>
                         </CardTitle>
-                        <p className="text-white/90 mt-2">
-                            Formatador de texto premium com alta acessibilidade
-                        </p>
                     </CardHeader>
 
                     <CardContent className="p-6 space-y-6">
@@ -135,7 +143,7 @@ export function TextEditor() {
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
                                 placeholder="Cole ou digite seu texto aqui..."
-                                className="min-h-[300px] text-base resize-y"
+                                className="min-h-[300px] text-base resize-y focus:ring-[#00A3FF] focus:border-[#00A3FF]"
                                 aria-label="Editor de texto principal"
                                 aria-describedby="text-stats"
                             />
@@ -150,7 +158,7 @@ export function TextEditor() {
                         >
                             <Badge
                                 variant="outline"
-                                className="text-sm px-4 py-2"
+                                className="text-sm px-4 py-2 border-primary/30 text-primary"
                                 aria-label={`${wordCount} palavras`}
                             >
                                 <MessageSquare className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -158,15 +166,14 @@ export function TextEditor() {
                             </Badge>
                             <Badge
                                 variant="outline"
-                                className="text-sm px-4 py-2"
+                                className="text-sm px-4 py-2 border-primary/30 text-primary"
                                 aria-label={`${charCount} caracteres`}
                             >
-                                <Type className="w-4 h-4 mr-2" aria-hidden="true" />
-                                {charCount} Caracteres
+                                📝 {charCount} Caracteres
                             </Badge>
                             <Badge
                                 variant="outline"
-                                className="text-sm px-4 py-2"
+                                className="text-sm px-4 py-2 border-primary/30 text-primary"
                                 aria-label={`Tempo de leitura estimado: ${readingTime} ${readingTime === 1 ? 'minuto' : 'minutos'}`}
                             >
                                 <BookOpen className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -186,7 +193,7 @@ export function TextEditor() {
                                     size="sm"
                                     disabled={!text}
                                     aria-label="Converter texto para maiúsculas"
-                                    className="hover:scale-105 transition-transform"
+                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
                                 >
                                     MAIÚSCULAS
                                 </Button>
@@ -196,7 +203,7 @@ export function TextEditor() {
                                     size="sm"
                                     disabled={!text}
                                     aria-label="Converter texto para minúsculas"
-                                    className="hover:scale-105 transition-transform"
+                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
                                 >
                                     minúsculas
                                 </Button>
@@ -206,7 +213,7 @@ export function TextEditor() {
                                     size="sm"
                                     disabled={!text}
                                     aria-label="Converter primeira letra de cada frase para maiúscula"
-                                    className="hover:scale-105 transition-transform"
+                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
                                 >
                                     Primeira Letra em Maiúscula
                                 </Button>
@@ -216,7 +223,7 @@ export function TextEditor() {
                                     size="sm"
                                     disabled={!text}
                                     aria-label="Remover espaços extras e quebras de linha duplas"
-                                    className="hover:scale-105 transition-transform"
+                                    className="hover:scale-105 transition-transform hover:bg-primary/10 hover:text-primary hover:border-primary"
                                 >
                                     Remover Espaços Extras
                                 </Button>
@@ -234,26 +241,17 @@ export function TextEditor() {
                             </div>
                         </div>
 
-                        {/* Botão de copiar */}
+                        {/* Botão de copiar com cores TextFix */}
                         <div className="pt-4 border-t">
                             <Button
                                 onClick={handleCopy}
                                 disabled={!text}
                                 size="lg"
-                                className="w-full sm:w-auto hover:scale-105 transition-transform"
-                                aria-label={copied ? "Texto copiado com sucesso" : "Copiar texto para área de transferência"}
+                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all"
+                                aria-label="Copiar texto para área de transferência"
                             >
-                                {copied ? (
-                                    <>
-                                        <Check className="w-5 h-5 mr-2" aria-hidden="true" />
-                                        Copiado com sucesso!
-                                    </>
-                                ) : (
-                                    <>
-                                        <Copy className="w-5 h-5 mr-2" aria-hidden="true" />
-                                        Copiar Texto
-                                    </>
-                                )}
+                                <Copy className="w-5 h-5 mr-2" aria-hidden="true" />
+                                Copiar Texto
                             </Button>
                         </div>
                     </CardContent>

@@ -6,39 +6,42 @@
 
 @layer base {
   :root {
-    /* === CORES HANAMI === */
-    --background: 220 100% 98%;
-    /* #F8FAFF - Clean Sky */
-    --foreground: 222 47% 11%;
-    /* #0F1419 - Texto escuro */
+    /* === CORES TEXTFIX === */
+    /* Conceito: "Ordem a partir do Caos" */
+
+    --background: 210 20% 97%;
+    /* #F5F8FA - Fundo cinza claro */
+    --foreground: 210 55% 15%;
+    /* #0F1F3D - Navy escuro para texto */
 
     --card: 0 0% 100%;
     /* #FFFFFF - Branco puro */
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 210 55% 23%;
+    /* #1A365D - Navy para texto em cards */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 210 55% 23%;
 
-    /* Primária: Action Blue */
-    --primary: 224 95% 65%;
-    /* #5481FA */
+    /* Primária: Ciano Brilhante (do lado direito do logo) */
+    --primary: 200 100% 50%;
+    /* #00A3FF - Ciano tecnológico */
     --primary-foreground: 0 0% 100%;
 
-    /* Secundária: Deep Navy */
-    --secondary: 228 57% 31%;
-    /* #22307F */
+    /* Secundária: Navy Profundo (do texto "Text") */
+    --secondary: 210 55% 23%;
+    /* #1A365D - Navy profundo */
     --secondary-foreground: 0 0% 100%;
 
+    /* Accent: Azul Intermediário */
+    --accent: 224 95% 65%;
+    /* #5481FA - Azul para highlights */
+    --accent-foreground: 0 0% 100%;
+
     /* Muted: Cinza claro */
-    --muted: 220 20% 96%;
+    --muted: 210 20% 96%;
     /* #F5F6F8 */
     --muted-foreground: 215 16% 47%;
     /* #6B7280 */
-
-    /* Accent: Variação do primário */
-    --accent: 224 95% 70%;
-    /* Azul mais claro */
-    --accent-foreground: 222 47% 11%;
 
     /* Destructive: Vermelho */
     --destructive: 0 84% 60%;
@@ -46,17 +49,17 @@
     --destructive-foreground: 0 0% 100%;
 
     /* Bordas e inputs */
-    --border: 220 13% 91%;
-    /* #E5E7EB */
-    --input: 220 13% 91%;
-    --ring: 224 95% 65%;
-    /* Mesma cor do primary */
+    --border: 210 20% 90%;
+    /* #E5E8EB */
+    --input: 210 20% 90%;
+    --ring: 200 100% 50%;
+    /* Ciano para focus ring */
 
     /* Border radius */
     --radius: 0.75rem;
-    /* 12px - Soft & Friendly */
+    /* 12px - Soft & Modern */
 
-    /* === CORES PERSONALIZADAS === */
+    /* === CORES PERSONALIZADAS TEXTFIX === */
     --success: 142 71% 45%;
     /* #22C55E - Verde */
     --success-foreground: 0 0% 100%;
@@ -65,28 +68,35 @@
     /* #F59E0B - Laranja */
     --warning-foreground: 0 0% 100%;
 
-    --info: 217 91% 60%;
-    /* #3B82F6 - Azul info */
+    --info: 200 100% 50%;
+    /* #00A3FF - Ciano (mesma cor primary) */
     --info-foreground: 0 0% 100%;
+
+    /* Cores adicionais do logo */
+    --ciano-light: 200 100% 60%;
+    /* #33B5FF - Hover states */
+    --navy-dark: 210 60% 15%;
+    /* #0F1F3D - Backgrounds escuros */
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 210 55% 10%;
     --foreground: 0 0% 98%;
 
-    --card: 222 47% 15%;
+    --card: 210 55% 15%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 15%;
+    --popover: 210 55% 15%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 224 95% 65%;
+    --primary: 200 100% 50%;
+    /* Ciano mantém em dark mode */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 228 57% 25%;
+    --secondary: 210 55% 20%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 217 33% 17%;
+    --muted: 210 40% 20%;
     --muted-foreground: 215 20% 65%;
 
     --accent: 224 95% 60%;
@@ -95,9 +105,9 @@
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 224 95% 65%;
+    --border: 210 40% 20%;
+    --input: 210 40% 20%;
+    --ring: 200 100% 50%;
   }
 }
 
