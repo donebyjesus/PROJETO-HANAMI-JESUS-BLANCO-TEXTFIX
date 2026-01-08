@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* === CORES HANAMI === */
+    --background: 220 100% 98%; /* #F8FAFF - Clean Sky */
+    --foreground: 222 47% 11%; /* #0F1419 - Texto escuro */
+
+    --card: 0 0% 100%; /* #FFFFFF - Branco puro */
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primária: Action Blue */
+    --primary: 224 95% 65%; /* #5481FA */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secundária: Deep Navy */
+    --secondary: 228 57% 31%; /* #22307F */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted: Cinza claro */
+    --muted: 220 20% 96%; /* #F5F6F8 */
+    --muted-foreground: 215 16% 47%; /* #6B7280 */
+
+    /* Accent: Variação do primário */
+    --accent: 224 95% 70%; /* Azul mais claro */
+    --accent-foreground: 222 47% 11%;
+
+    /* Destructive: Vermelho */
+    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Bordas e inputs */
+    --border: 220 13% 91%; /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 224 95% 65%; /* Mesma cor do primary */
+
+    /* Border radius */
+    --radius: 0.75rem; /* 12px - Soft & Friendly */
+
+    /* === CORES PERSONALIZADAS === */
+    --success: 142 71% 45%; /* #22C55E - Verde */
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%; /* #F59E0B - Laranja */
+    --warning-foreground: 0 0% 100%;
+    
+    --info: 217 91% 60%; /* #3B82F6 - Azul info */
+    --info-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 0 0% 98%;
+
+    --card: 222 47% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 222 47% 15%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 224 95% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 228 57% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 224 95% 60%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 95% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
