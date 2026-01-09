@@ -47,7 +47,7 @@ interface HistoryEntry {
  * - Histórico: Desfazer/Refazer (Ctrl+Z/Ctrl+Y)
  * - Transformações: MAIÚSCULAS, minúsculas, Primeira Letra, Remover espaços
  * - Textos salvos: Últimos 5 com timestamp
- * - Toolbar sticky responsiva
+ * - Barra de ferramentas fixa responsiva
  * - Atalhos de teclado
  */
 export function TextEditor() {
@@ -287,7 +287,7 @@ export function TextEditor() {
             <Card className="overflow-visible shadow-2xl">
                 <CardContent className="p-0">
                     {/* Toolbar Sticky */}
-                    <div className="sticky top-[80px] z-20 bg-white border-b shadow-md">
+                    <div className="sticky top-0 z-40 bg-white border-b shadow-md transition-[top] duration-100 ease-linear">
                         <div className="p-3 sm:p-4 space-y-3">
                             <div className="flex flex-wrap gap-1.5 sm:gap-2 items-center text-xs sm:text-sm">
                                 <div className="flex gap-1">

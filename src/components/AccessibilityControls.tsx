@@ -13,7 +13,11 @@ import { Button } from '@/components/ui/button'
  * Persistência: localStorage
  * Conformidade: WCAG 2.1 Level AA
  */
-export function AccessibilityControls() {
+interface AccessibilityControlsProps {
+    orientation?: 'horizontal' | 'vertical'
+}
+
+export function AccessibilityControls({ orientation = 'horizontal' }: AccessibilityControlsProps) {
     const [fontSize, setFontSize] = useState(16)
     const [highContrast, setHighContrast] = useState(false)
     const [grayscale, setGrayscale] = useState(false)
@@ -126,81 +130,89 @@ export function AccessibilityControls() {
         localStorage.setItem('accessibility-grayscale', newState.toString())
     }
 
+    const isVertical = orientation === 'vertical'
+
     return (
         <div
-            className="flex items-center gap-1 sm:gap-2"
+            className={`flex ${isVertical ? 'flex-col gap-2' : 'flex-row items-center gap-1 sm:gap-2'}`}
             role="toolbar"
             aria-label="Controles de acessibilidade"
         >
-            {/* Diminuir Fonte */}
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={decreaseFontSize}
-                disabled={fontSize <= 8}
-                className="h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-primary/10"
-                title={`Diminuir tamanho da fonte (atual: ${fontSize}px)`}
-                aria-label={`Diminuir tamanho da fonte. Tamanho atual: ${fontSize} pixels`}
-            >
-                <ZoomOut className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
+            {/* Controles de Fonte */}
+            <div className={`flex items-center ${isVertical ? 'flex-col gap-1' : 'gap-1'}`}>
+                {/* Aumentar Fonte */}
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={increaseFontSize}
+                    disabled={fontSize >= 100}
+                    className="h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-primary/10"
+                    title={`Aumentar tamanho da fonte (atual: ${fontSize}px)`}
+                    aria-label={`Aumentar tamanho da fonte. Tamanho atual: ${fontSize} pixels`}
+                >
+                    <ZoomIn className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
 
-            {/* Indicador de Tamanho */}
-            <span
-                className="text-xs font-medium text-muted-foreground min-w-[2.5rem] text-center hidden sm:inline"
-                aria-live="polite"
-                aria-atomic="true"
-            >
-                {fontSize}px
-            </span>
+                {/* Indicador de Tamanho */}
+                <span
+                    className={`text-xs font-medium text-muted-foreground text-center ${isVertical ? 'py-1' : 'min-w-[2.5rem] hidden sm:inline'}`}
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
+                    {fontSize}px
+                </span>
 
-            {/* Aumentar Fonte */}
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={increaseFontSize}
-                disabled={fontSize >= 100}
-                className="h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-primary/10"
-                title={`Aumentar tamanho da fonte (atual: ${fontSize}px)`}
-                aria-label={`Aumentar tamanho da fonte. Tamanho atual: ${fontSize} pixels`}
-            >
-                <ZoomIn className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
+                {/* Diminuir Fonte */}
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={decreaseFontSize}
+                    disabled={fontSize <= 8}
+                    className="h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-primary/10"
+                    title={`Diminuir tamanho da fonte (atual: ${fontSize}px)`}
+                    aria-label={`Diminuir tamanho da fonte. Tamanho atual: ${fontSize} pixels`}
+                >
+                    <ZoomOut className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
+            </div>
 
             {/* Divisor */}
-            <div className="w-px h-6 bg-border mx-1 hidden sm:block" aria-hidden="true" />
+            <div className={`${isVertical ? 'h-px w-6 my-1' : 'w-px h-6 mx-1 hidden sm:block'} bg-border`} aria-hidden="true" />
 
-            {/* Alto Contraste */}
-            <Button
-                variant={highContrast ? "default" : "ghost"}
-                size="sm"
-                onClick={toggleHighContrast}
-                className={`h-8 w-8 sm:h-9 sm:w-9 p-0 ${highContrast
-                    ? 'bg-foreground text-background hover:bg-foreground/90'
-                    : 'hover:bg-primary/10'
-                    }`}
-                title={highContrast ? "Desativar alto contraste" : "Ativar alto contraste (preto e branco)"}
-                aria-label={`${highContrast ? 'Desativar' : 'Ativar'} modo de alto contraste`}
-                aria-pressed={highContrast}
-            >
-                <Contrast className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
+            {/* Modos de Cor */}
+            <div className={`flex items-center ${isVertical ? 'flex-col gap-2' : 'gap-1'}`}>
+                {/* Alto Contraste */}
+                <Button
+                    variant={highContrast ? "default" : "ghost"}
+                    size="sm"
+                    onClick={toggleHighContrast}
+                    className={`h-8 w-8 sm:h-9 sm:w-9 p-0 ${highContrast
+                        ? 'bg-foreground text-background hover:bg-foreground/90'
+                        : 'hover:bg-primary/10'
+                        }`}
+                    title={highContrast ? "Desativar alto contraste" : "Ativar alto contraste (preto e branco)"}
+                    aria-label={`${highContrast ? 'Desativar' : 'Ativar'} modo de alto contraste`}
+                    aria-pressed={highContrast}
+                >
+                    <Contrast className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
 
-            {/* Escala de Cinza */}
-            <Button
-                variant={grayscale ? "default" : "ghost"}
-                size="sm"
-                onClick={toggleGrayscale}
-                className={`h-8 w-8 sm:h-9 sm:w-9 p-0 ${grayscale
-                    ? 'bg-neutral-600 text-white hover:bg-neutral-700'
-                    : 'hover:bg-primary/10'
-                    }`}
-                title={grayscale ? "Desativar escala de cinza" : "Ativar escala de cinza"}
-                aria-label={`${grayscale ? 'Desativar' : 'Ativar'} modo escala de cinza`}
-                aria-pressed={grayscale}
-            >
-                <Palette className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
+                {/* Escala de Cinza */}
+                <Button
+                    variant={grayscale ? "default" : "ghost"}
+                    size="sm"
+                    onClick={toggleGrayscale}
+                    className={`h-8 w-8 sm:h-9 sm:w-9 p-0 ${grayscale
+                        ? 'bg-neutral-600 text-white hover:bg-neutral-700'
+                        : 'hover:bg-primary/10'
+                        }`}
+                    title={grayscale ? "Desativar escala de cinza" : "Ativar escala de cinza"}
+                    aria-label={`${grayscale ? 'Desativar' : 'Ativar'} modo escala de cinza`}
+                    aria-pressed={grayscale}
+                >
+                    <Palette className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
+            </div>
 
             {/* Indicador de Status (Screen Reader) */}
             <div className="sr-only" aria-live="polite" aria-atomic="true">
