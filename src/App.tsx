@@ -1,7 +1,6 @@
 import { ToastProvider } from '@/components/ui/use-toast'
 import { TextEditor } from '@/components/TextEditor'
-import { QuickLinks } from '@/components/QuickLinks'
-import { UnitConverter } from '@/components/UnitConverter'
+
 import { Logo } from '@/components/Logo'
 import { AccessibilityControls } from '@/components/AccessibilityControls'
 
@@ -35,12 +34,6 @@ function App() {
                         {/* TextEditor */}
                         <section>
                             <TextEditor />
-                        </section>
-
-                        {/* QuickLinks & UnitConverter em grid responsivo */}
-                        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <QuickLinks />
-                            <UnitConverter />
                         </section>
                     </div>
                 </main>

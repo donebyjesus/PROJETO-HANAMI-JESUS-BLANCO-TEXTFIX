@@ -46,8 +46,8 @@ export function AccessibilityControls() {
      * Atualiza o fontSize do body e a variável CSS
      */
     const applyFontSize = (size: number) => {
-        // Aplica ao body para afetar todo o documento
-        document.body.style.fontSize = `${size}px`
+        // Aplica ao html para escalar unidades REM do Tailwind
+        document.documentElement.style.fontSize = `${size}px`
         // Também define a variável CSS para uso em componentes
         document.documentElement.style.setProperty('--base-font-size', `${size}px`)
     }
