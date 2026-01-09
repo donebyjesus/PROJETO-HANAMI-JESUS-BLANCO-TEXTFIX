@@ -1,5 +1,7 @@
+import { Suspense, lazy } from 'react'
 import { ToastProvider } from '@/components/ui/use-toast'
-import { TextEditor } from '@/components/TextEditor'
+// Lazy load do TextEditor
+const TextEditor = lazy(() => import('@/components/TextEditor').then(module => ({ default: module.TextEditor })))
 
 import { Logo } from '@/components/Logo'
 import { AccessibilityControls } from '@/components/AccessibilityControls'
@@ -8,7 +10,7 @@ function App() {
     return (
         <ToastProvider>
             <div className="min-h-screen bg-background">
-                {/* Header TextFix */}
+                {/* ... existing header code ... */}
                 <header className="border-b bg-gradient-to-r from-primary/5 via-background to-secondary/5 backdrop-blur-sm top-0 z-30 shadow-soft">
                     <div className="container mx-auto px-4 py-4 sm:py-6">
                         {/* Controles de Acessibilidade - Mobile (Topo Direita) */}
@@ -38,10 +40,13 @@ function App() {
                     <div className="space-y-8 max-w-6xl mx-auto">
                         {/* Editor de Texto */}
                         <section>
-                            <TextEditor />
+                            <Suspense fallback={<div className="flex justify-center p-12 text-muted-foreground">Carregando editor...</div>}>
+                                <TextEditor />
+                            </Suspense>
                         </section>
                     </div>
                 </main>
+
 
                 {/* Rodapé */}
                 <footer className="border-t mt-16 py-8 bg-gradient-to-r from-primary/5 to-secondary/5">
