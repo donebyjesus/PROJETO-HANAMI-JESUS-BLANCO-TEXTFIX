@@ -5,9 +5,7 @@ TextFix é uma ferramenta de edição de texto rica, moderna e focada na máxima
 ## 🚀 Acesso à Produção
 
 Acesse a versão online mais recente aqui:
-**[LINK_DO_VERCEL_AQUI]**
-
-*(Este link será atualizado após o deploy)*
+https://projeto-hanami-jesus-blanco-textfix.vercel.app
 
 ## 🛠️ Instalação Local
 
@@ -33,7 +31,7 @@ Para rodar o projeto em sua máquina:
 
 ## ✨ Funcionalidades
 
--   **Editor Rico**: Formatação completa (negrito, itálico, listas, alinhamento).
+-   **Editor Rico**: Formatação completa (negrito, itálico, listas, alinhamento e mais).
 -   **Acessibilidade Total**: Controles de fonte, alto contraste e escala de cinza sempre visíveis.
 -   **Design Responsivo**: Interface adaptável com barra de ferramentas fixa e maximização de espaço de tela.
 -   **Histórico e Salvamento**: Salve seus textos localmente e navegue pelo histórico de alterações.
