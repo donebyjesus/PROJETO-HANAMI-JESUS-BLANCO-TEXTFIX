@@ -144,9 +144,12 @@ export function TextEditor() {
     const handleUndo = () => {
         if (historyIndex > 0 && editorRef.current) {
             const newIndex = historyIndex - 1
-            setHistoryIndex(newIndex)
-            editorRef.current.innerHTML = history[newIndex].content
-            setText(editorRef.current.innerText)
+            const entry = history[newIndex]
+            if (entry) {
+                setHistoryIndex(newIndex)
+                editorRef.current.innerHTML = entry.content
+                setText(editorRef.current.innerText)
+            }
         }
     }
 
@@ -157,9 +160,12 @@ export function TextEditor() {
     const handleRedo = () => {
         if (historyIndex < history.length - 1 && editorRef.current) {
             const newIndex = historyIndex + 1
-            setHistoryIndex(newIndex)
-            editorRef.current.innerHTML = history[newIndex].content
-            setText(editorRef.current.innerText)
+            const entry = history[newIndex]
+            if (entry) {
+                setHistoryIndex(newIndex)
+                editorRef.current.innerHTML = entry.content
+                setText(editorRef.current.innerText)
+            }
         }
     }
 

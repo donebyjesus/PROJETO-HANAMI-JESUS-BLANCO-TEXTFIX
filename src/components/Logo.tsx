@@ -14,7 +14,7 @@ interface LogoProps {
     iconOnly?: boolean
 }
 
-export function Logo({ size = 120, className = '', iconOnly = false }: LogoProps) {
+export function Logo({ size = 120, className = '' }: LogoProps) {
     return (
         <div className={`flex items-center ${className}`}>
             <img
