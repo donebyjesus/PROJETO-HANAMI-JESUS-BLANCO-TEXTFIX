@@ -360,19 +360,28 @@ export function TextEditor() {
                             <Badge variant="outline" className="text-sm px-4 py-2 border-primary/30 text-primary">📝 {charCount} Caracteres</Badge>
                             <Badge variant="outline" className="text-sm px-4 py-2 border-primary/30 text-primary"><BookOpen className="w-4 h-4 mr-2" />{readingTime} min</Badge>
 
-                            <div className="relative">
-                                <Badge variant="outline" className="text-sm px-4 py-2 border-accent/30 text-accent cursor-pointer hover:bg-accent/10" onClick={() => setShowHistoryPopup(!showHistoryPopup)} title="Ver histórico">📜 {history.length} mudanças</Badge>
+                            <div className="relative" onMouseEnter={() => setShowHistoryPopup(true)} onMouseLeave={() => setShowHistoryPopup(false)}>
+                                <Badge variant="outline" className="text-sm px-4 py-2 border-accent/30 text-accent cursor-pointer hover:bg-accent/10" title="Ver histórico">📜 {history.length} mudanças</Badge>
                                 <AnimatePresence>
                                     {showHistoryPopup && (
-                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute bottom-full mb-2 right-0 bg-white border shadow-lg rounded-lg p-3 w-64 z-30">
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute bottom-full mb-2 right-0 bg-white border shadow-lg rounded-lg p-3 w-72 z-30">
                                             <div className="flex justify-between items-center mb-2">
-                                                <h4 className="text-xs font-semibold">Histórico</h4>
-                                                <Button variant="ghost" size="sm" onClick={() => setShowHistoryPopup(false)} className="h-5 w-5 p-0"><X className="w-3 h-3" /></Button>
+                                                <h4 className="text-xs font-semibold">Últimas 10 Mudanças</h4>
                                             </div>
-                                            <div className="max-h-48 overflow-y-auto space-y-1">
-                                                {history.slice().reverse().map((_, idx) => {
+                                            <div className="max-h-64 overflow-y-auto space-y-1">
+                                                {history.slice().reverse().slice(0, 10).map((entry, idx) => {
                                                     const actualIdx = history.length - 1 - idx
-                                                    return <div key={idx} className={`text-xs p-1.5 rounded ${actualIdx === historyIndex ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground'}`}>{actualIdx === historyIndex ? '→ ' : '  '}Mudança #{actualIdx + 1}</div>
+                                                    return (
+                                                        <div key={idx} className={`text-xs p-1.5 rounded flex flex-col ${actualIdx === historyIndex ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground hover:bg-muted/50'}`}>
+                                                            <span className="flex items-center gap-1">
+                                                                {actualIdx === historyIndex && <span>→</span>}
+                                                                {entry.description}
+                                                            </span>
+                                                            <span className="text-[10px] opacity-70 ml-4">
+                                                                {new Date(entry.timestamp).toLocaleTimeString('pt-BR')}
+                                                            </span>
+                                                        </div>
+                                                    )
                                                 })}
                                             </div>
                                         </motion.div>
